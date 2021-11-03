@@ -75,7 +75,7 @@ client.on('messageCreate', function (message) { return __awaiter(void 0, void 0,
         switch (_a.label) {
             case 0:
                 if (!(message.content === 'ping')) return [3 /*break*/, 2];
-                return [4 /*yield*/, message.reply('Pong!')];
+                return [4 /*yield*/, message.reply('Pong!!')];
             case 1:
                 _a.sent();
                 _a.label = 2;

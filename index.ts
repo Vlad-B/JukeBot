@@ -15,7 +15,7 @@ client.on('ready', ()=> {
 
 client.on('messageCreate', async message => {
     if (message.content === 'ping') {
-        await message.reply('Pong!');
+        await message.reply('Pong!!');
     }
 })
 
