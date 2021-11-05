@@ -38,7 +38,25 @@ module.exports = {
 			selfDeaf: false
 		});
 
-		connection.subscribe()
+		const videoFinder = async (query) => {
+			const videoResults = await yTsearch(query)
+			return (videoResults.videos.length > 1) ? videoResults.videos[0] : null
+		}
+		
+		const video = await videoFinder(args)
+		
+		if(video) {
+			const stream = ytdl(video.url, { filter: 'audioonly' });
+			const resource = createAudioResource(stream, { inputType: StreamType.Arbitrary });
+			const player = createAudioPlayer();
+		
+			player.play(resource);
+			connection.subscribe(player);
+			
+			await interaction.reply(`:call_me: Now playing *** ${video.title} ***`)
+		} else {
+			await interaction.reply('No video results found.')
+		}
   	}
 }
    
