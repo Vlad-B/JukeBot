@@ -12,7 +12,7 @@ const {
 
 const dotenv = require('dotenv');
 dotenv.config()
-
+const guildId = process.env.GUILD_ID;
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -30,6 +30,15 @@ module.exports = {
 		
 		if(!interaction.member.permissions.has(reqPerms)) await interaction.reply("You don't have the required permissions.");
 		if(!voiceChannel) return interaction.reply('You need to be in a voice channel to execute this command!');
+
+		const connection = joinVoiceChannel({
+			channelId: voiceChannel.id,
+			guildId: guildId,
+			adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+			selfDeaf: false
+		});
+
+		connection.subscribe()
   	}
 }
    
