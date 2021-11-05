@@ -42,13 +42,12 @@ module.exports = {
 			const videoResults = await yTsearch(query)
 			return (videoResults.videos.length > 1) ? videoResults.videos[0] : null
 		}
-		
 		const video = await videoFinder(args)
+		const player = createAudioPlayer();
 		
 		if(video) {
 			const stream = ytdl(video.url, { filter: 'audioonly' });
 			const resource = createAudioResource(stream, { inputType: StreamType.Arbitrary });
-			const player = createAudioPlayer();
 		
 			player.play(resource);
 			connection.subscribe(player);
@@ -57,7 +56,6 @@ module.exports = {
 		} else {
 			await interaction.reply('No video results found.')
 		}
-
 		player.on(AudioPlayerStatus.Idle, () => connection.destroy());
   	}
 }
