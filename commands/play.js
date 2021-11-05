@@ -57,6 +57,8 @@ module.exports = {
 		} else {
 			await interaction.reply('No video results found.')
 		}
+
+		player.on(AudioPlayerStatus.Idle, () => connection.destroy());
   	}
 }
    
