@@ -13,6 +13,7 @@ const {
 const dotenv = require('dotenv');
 dotenv.config()
 
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('play')
@@ -24,9 +25,11 @@ module.exports = {
 
 	async execute(interaction, args) {
 		args = interaction.options.getString('url');
+		const voiceChannel = interaction.member.voice.channel
 		const reqPerms = [ Permissions.FLAGS.CONNECT, Permissions.FLAGS.SPEAK ];
 		
 		if(!interaction.member.permissions.has(reqPerms)) await interaction.reply("You don't have the required permissions.");
+		if(!voiceChannel) return interaction.reply('You need to be in a voice channel to execute this command!');
   	}
 }
    
