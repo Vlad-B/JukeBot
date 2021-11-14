@@ -22,7 +22,7 @@ for (const file of commandFiles) {
 }
 
 client.on('ready', () => {
-	client.user.setPresence({activities: [{name: '/help for info', type: 'PLAYING'}], status: 'online'})
+	client.user.setPresence({activities: [{name: 'music | /help', type: 'PLAYING'}], status: 'online'})
 })
 
 client.on('interactionCreate', async (interaction) => {
