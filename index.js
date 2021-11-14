@@ -1,5 +1,6 @@
 const fs = require('fs')
-const { Client, Intents, Collection, Activity } = require('discord.js')
+const { Client, Intents, Collection } = require('discord.js')
+const { deployCommands } = require('./deploy-commands')
 
 const dotenv = require('dotenv');
 dotenv.config()
@@ -21,6 +22,10 @@ for (const file of commandFiles) {
 	client.commands.set(command.data.name, command);
 }
 
+client.once('ready', () => {
+	deployCommands()
+})
+
 client.on('ready', () => {
 	client.user.setPresence({activities: [{name: '/help for info', type: 'PLAYING'}], status: 'online'})
 })
@@ -39,9 +44,5 @@ client.on('interactionCreate', async (interaction) => {
 		return interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
 	}
 });
-
-client.once('ready', () => {
-	console.log('Bot is running')
-})
 
 client.login(token)
