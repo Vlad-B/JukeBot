@@ -1,10 +1,14 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { Unpause } = require('../dispatcher.js')
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('upsause')
-		.setDescription('Stops playing from YouTube.'),
+		.setName('unpause')
+		.setDescription('Resume playing.'),
 	async execute(interaction) {
-		return interaction.reply('Stopepd playing (song).');
-	},
-};
+		if (interaction) {
+			Unpause(interaction)
+			await interaction.reply('Resumed playing your song.') 
+		}
+	}
+}
