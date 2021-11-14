@@ -7,5 +7,8 @@ module.exports ={
     },
     Unpause: (interaction) => {
         if (play.player && interaction) play.player.unpause();
+    },
+    Stop: (interaction) => {
+        if (play.player && interaction) play.player.stop();
     }
 }
