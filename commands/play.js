@@ -18,19 +18,29 @@ module.exports = {
 			.setName('title')
 			.setDescription('Song title.')
 			.setRequired(true)),
+
 	player: createAudioPlayer(),
-	async execute(interaction, args) {
-		args = interaction.options.getString('title');
+	
+	voiceChannel: (interaction) => {
 		const voiceChannel = interaction.member.voice.channel;
+		return voiceChannel;
+	},
+	
+	checkPerms: (interaction, channel) => {
 		const reqPerms = [ Permissions.FLAGS.CONNECT, Permissions.FLAGS.SPEAK ];
 		
 		if(!interaction.member.permissions.has(reqPerms)) return interaction.reply("You don't have the required permissions.");
-		if(!voiceChannel) return interaction.reply('You need to be in a voice channel to execute this command!');
+		if(!channel) return interaction.reply('You need to be in a voice channel to execute this command!');
+	},
+	
+	async execute(interaction, args) {
+		args = interaction.options.getString('title');
+		this.checkPerms(interaction, this.voiceChannel(interaction))
 
 		const connection = joinVoiceChannel({
-			channelId: voiceChannel.id,
-			guildId: voiceChannel.guildId,
-			adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+			channelId: this.voiceChannel(interaction).id,
+			guildId: this.voiceChannel(interaction).guildId,
+			adapterCreator: this.voiceChannel(interaction).guild.voiceAdapterCreator,
 			selfDeaf: false
 		});
 
