@@ -23,12 +23,6 @@ for (const file of commandFiles) {
 	client.commands.set(command.data.name, command);
 }
 
-let testGuild;
-client.once('ready', () => {
-	testGuild = !!client.guilds.cache.get(testGuildId);
-	deployCommands(testGuild);
-})
-
 client.on('ready', () => {
 	client.user.setPresence({activities: [{name: 'music | /help', type: 'PLAYING'}], status: 'online'})
 })
