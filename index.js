@@ -5,7 +5,6 @@ const { deployCommands } = require('./deploy-commands')
 const dotenv = require('dotenv');
 dotenv.config()
 const token = process.env.DISCORD_TOKEN;
-const testGuildId = process.env.TEST_GUILD_ID;
 
 const client = new Client({
 	intents: [
@@ -23,11 +22,9 @@ for (const file of commandFiles) {
 	client.commands.set(command.data.name, command);
 }
 
-let testGuild;
-client.once('ready', () => {
-	testGuild = !!client.guilds.cache.get(testGuildId);
-	deployCommands(testGuild);
-})
+// client.once('ready', () => {
+// 	deployCommands();
+// })
 
 client.on('ready', () => {
 	client.user.setPresence({activities: [{name: 'music | /help', type: 'PLAYING'}], status: 'online'})

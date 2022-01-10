@@ -19,17 +19,6 @@ const rest = new REST({ version: '9' }).setToken(token);
 
 const testGuildId = process.env.TEST_GUILD_ID;
 
-module.exports = {
-	deployCommands: async (testGuild) => {
-		console.log('Bot is running')
-		if(testGuild) {
-			await rest.put(Routes.applicationGuildCommands(clientId, testGuildId), { body: commands })
-			.then(() => console.log('Successfully registered application commands for development guild.'))
-			.catch(console.error);
-		} else {
-			await rest.put(Routes.applicationCommands(clientId), { body: commands })
-			.then(() => console.log('Successfully registered application commands globally.'))
-			.catch(console.error);
-		}
-	}
-}
+rest.put(Routes.applicationGuildCommands(clientId, testGuildId), { body: commands })
+	.then(() => console.log('Successfully registered application commands.'))
+	.catch(console.error);
