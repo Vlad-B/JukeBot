@@ -43,6 +43,7 @@ module.exports = {
     async execute(interaction, args) {
         args = interaction.options.getString("title");
         this.checkPerms(interaction, this.voiceChannel(interaction));
+        await interaction.deferReply();
 
         const connection = joinVoiceChannel({
             channelId: this.voiceChannel(interaction).id,
@@ -69,15 +70,15 @@ module.exports = {
             connection.subscribe(this.player);
             this.player.play(resource);
 
-            await interaction.reply(
+            await interaction.editReply(
                 `:call_me: Now playing *** ${video.title} ***`
             );
         } else {
-            await interaction.reply("No video results found.");
+            await interaction.editReply("No video results found.");
         }
 
-        this.player.on(AudioPlayerStatus.Idle, () =>
-            setTimeout(() => connection.destroy(), 60000)
-        );
+        this.player.on(AudioPlayerStatus.Idle, () => {
+            setTimeout(() => connection.disconnect(), 60000);
+        });
     },
 };
