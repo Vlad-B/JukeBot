@@ -76,6 +76,8 @@ module.exports = {
             await interaction.reply("No video results found.");
         }
 
-        this.player.on(AudioPlayerStatus.Idle, () => connection.destroy());
+        this.player.on(AudioPlayerStatus.Idle, () =>
+            setTimeout(() => connection.destroy(), 60000)
+        );
     },
 };
