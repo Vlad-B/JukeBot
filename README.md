@@ -13,6 +13,7 @@ This bot uses slash ``` / ``` commands.
 
 ``` /play <song-title> ``` \
 ``` /pause ``` \
+``` /unpause ``` \
 ``` /stop ```
 
 # Built with
