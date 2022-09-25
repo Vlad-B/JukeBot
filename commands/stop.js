@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { checkPerms, voiceChannel, player } = require('./play')
-const { Stop } = require('../dispatcher.js')
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -11,7 +10,7 @@ module.exports = {
 		checkPerms(interaction, voiceChannel(interaction))
 
 		if (interaction) {
-			Stop(interaction)
+			if (player && interaction) player.stop();
 			await interaction.reply('Stopped playing. Good bye :)') 
 		}
 	}
