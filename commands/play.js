@@ -19,39 +19,73 @@ module.exports = {
                 .setDescription("Song title.")
                 .setRequired(true)
         ),
+    players: {},
+    connections: {},
+    servers: {},
+    async playResource(interaction, video, msg) {
+        const guildId = interaction.guildId;
+        const server = this.servers[guildId];
+        const player = this.players[guildId];
+        const connection = this.connections[guildId]
+        const stream = await play.stream(video.url);
+        const resource = createAudioResource(stream.stream, {
+            inputType: stream.type,
+        });
 
-    player: createAudioPlayer(),
-
-    voiceChannel: (interaction) => {
-        const voiceChannel = interaction.member.voice.channel;
-        return voiceChannel;
-    },
-
-    checkPerms: (interaction, channel) => {
-        const reqPerms = [Permissions.FLAGS.CONNECT, Permissions.FLAGS.SPEAK];
-
-        if (!interaction.member.permissions.has(reqPerms))
-            return interaction.reply(
-                "You don't have the required permissions."
+        player.play(resource);
+        if (msg === "play") {
+            await interaction.editReply(
+                `:arrow_forward: Now playing *** ${video.title} ***`
             );
-        if (!channel)
-            return interaction.reply(
+        } else if (msg === "queue") {
+            await interaction.channel.send(
+                `:arrow_forward: Now playing *** ${video.title} *** from queue.`
+            );
+        }
+
+        server.queue.shift();
+        player.on(AudioPlayerStatus.Idle, async () => {
+            if (server.queue[0]) {
+                this.playResource(interaction, server.queue[0], "queue");
+            } else {
+                setTimeout(() => connection.disconnect(), 60000);
+            }
+        });
+    },
+    async execute(interaction, args) {
+        interaction.deferReply();
+        const reqPerms = [Permissions.FLAGS.CONNECT, Permissions.FLAGS.SPEAK];
+        if (!interaction.member.voice.channel) {
+            return interaction.editReply(
                 "You need to be in a voice channel to execute this command!"
             );
-    },
+        } else if (!interaction.member.permissions.has(reqPerms))
+            return interaction.editReply(
+                "You don't have the required permissions."
+            );
 
-    async execute(interaction, args) {
         args = interaction.options.getString("title");
-        this.checkPerms(interaction, this.voiceChannel(interaction));
-        await interaction.deferReply();
+        const guildId = interaction.guildId;
 
-        const connection = joinVoiceChannel({
-            channelId: this.voiceChannel(interaction).id,
-            guildId: this.voiceChannel(interaction).guildId,
-            adapterCreator:
-                this.voiceChannel(interaction).guild.voiceAdapterCreator,
-            selfDeaf: false,
-        });
+        if(!this.players[guildId]) {
+            this.players[guildId] = createAudioPlayer();
+        }
+        if (!this.servers[guildId])
+        this.servers[guildId] = {
+            queue: [],
+        };
+        if (!this.connections.hasOwnProperty(guildId)) {
+            this.connections[guildId] = joinVoiceChannel({
+                channelId: interaction.member.voice.channel.id,
+                guildId,
+                adapterCreator:
+                    interaction.member.voice.channel.guild.voiceAdapterCreator,
+                selfDeaf: false,
+            });
+            this.connections[guildId].subscribe(this.players[guildId]);
+        } else {
+            this.connections[guildId].subscribe(this.players[guildId]);
+        }
 
         const videoFinder = async (query) => {
             const videoResults = await yTsearch(query);
@@ -62,23 +96,18 @@ module.exports = {
         const video = await videoFinder(args);
 
         if (video) {
-            const stream = await play.stream(video.url);
-            const resource = createAudioResource(stream.stream, {
-                inputType: stream.type,
-            });
-
-            connection.subscribe(this.player);
-            this.player.play(resource);
-
-            await interaction.editReply(
-                `:call_me: Now playing *** ${video.title} ***`
-            );
+            const server = this.servers[guildId]
+            const player = this.players[guildId]
+            server.queue.push(video);
+            if (player.state.status === "idle") {
+                this.playResource(interaction, server.queue[0], "play");
+            } else if (player.state.status === "playing") {
+                await interaction.editReply(
+                    `:white_check_mark: Added: *** ${video.title} ***`
+                );
+            }
         } else {
             await interaction.editReply("No video results found.");
         }
-
-        this.player.on(AudioPlayerStatus.Idle, () => {
-            setTimeout(() => connection.disconnect(), 60000);
-        });
     },
 };

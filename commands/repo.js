@@ -5,6 +5,6 @@ module.exports = {
         .setName("repo")
         .setDescription("Link to my GitHub repository."),
     async execute(interaction) {
-        return interaction.reply(`https://github.com/Vlad-B/discord-music-bot`);
+        return await interaction.reply(`https://github.com/Vlad-B/discord-music-bot`);
     },
 };
