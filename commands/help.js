@@ -5,6 +5,11 @@ module.exports = {
 		.setName('help')
         .setDescription('Music commands'),
 	async execute(interaction) {
-		return interaction.reply('Use the following commands to access the music features:\n/play <song-tite>\n/pause\n/unpause\n/stop');
+		return await interaction.reply(
+		`Use the following commands to access the music features:
+		/play <song-tite>  (Use this again to add to the queue)
+		/pause
+		/resume
+		/stop`)
 	},
 };
