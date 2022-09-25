@@ -47,9 +47,10 @@ module.exports = {
         player.on(AudioPlayerStatus.Idle, async () => {
             if (server.queue[0]) {
                 this.playResource(interaction, server.queue[0], "queue");
-            } else {
-                setTimeout(() => connection.disconnect(), 60000);
-            }
+            } 
+            // else {
+            //     setTimeout(() => connection.disconnect(), 60000);
+            // }
         });
     },
     async execute(interaction, args) {
