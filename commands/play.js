@@ -48,13 +48,16 @@ module.exports = {
             if (server.queue[0]) {
                 this.playResource(interaction, server.queue[0], "queue");
             } 
-            // else {
-            //     setTimeout(() => connection.disconnect(), 60000);
-            // }
+            else {
+                await interaction.channel.send('**Queue finished... Leaving!**')
+                setTimeout(() => {
+                    connection.disconnect();
+                  }, 15000);
+            }
         });
     },
     async execute(interaction, args) {
-        interaction.deferReply();
+        await interaction.deferReply();
         const reqPerms = [Permissions.FLAGS.CONNECT, Permissions.FLAGS.SPEAK];
         if (!interaction.member.voice.channel) {
             return interaction.editReply(
