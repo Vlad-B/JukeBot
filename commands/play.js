@@ -22,11 +22,15 @@ module.exports = {
     players: {},
     connections: {},
     servers: {},
+    async videoFinder(query) {
+        const videoResults = await yTsearch(query);
+        return videoResults.videos.length > 1 ? videoResults.videos[0] : null;
+    },
     async playResource(interaction, video, msg) {
         const guildId = interaction.guildId;
         const server = this.servers[guildId];
         const player = this.players[guildId];
-        const connection = this.connections[guildId]
+        const connection = this.connections[guildId];
         const stream = await play.stream(video.url);
         const resource = createAudioResource(stream.stream, {
             inputType: stream.type,
@@ -47,16 +51,15 @@ module.exports = {
         player.on(AudioPlayerStatus.Idle, async () => {
             if (server.queue[0]) {
                 this.playResource(interaction, server.queue[0], "queue");
-            } 
-            else {
-                await interaction.channel.send('**Queue finished... Leaving!**')
+            } else {
+                await interaction.channel.send("**Queue finished**");
                 setTimeout(() => {
                     connection.disconnect();
-                  }, 15000);
+                }, 15000);
             }
         });
     },
-    async execute(interaction, args) {
+    async execute(interaction) {
         await interaction.deferReply();
         const reqPerms = [Permissions.FLAGS.CONNECT, Permissions.FLAGS.SPEAK];
         if (!interaction.member.voice.channel) {
@@ -68,16 +71,22 @@ module.exports = {
                 "You don't have the required permissions."
             );
 
-        args = interaction.options.getString("title");
+        const args = interaction.options.getString("title");
         const guildId = interaction.guildId;
 
-        if(!this.players[guildId]) {
+        // Create server
+        if (!this.servers[guildId]) {
+            this.servers[guildId] = {
+                queue: [],
+            };
+        }
+
+        // Create Audio Player
+        if (!this.players[guildId]) {
             this.players[guildId] = createAudioPlayer();
         }
-        if (!this.servers[guildId])
-        this.servers[guildId] = {
-            queue: [],
-        };
+
+        // Create Connection and Subscribe
         if (!this.connections.hasOwnProperty(guildId)) {
             this.connections[guildId] = joinVoiceChannel({
                 channelId: interaction.member.voice.channel.id,
@@ -87,21 +96,12 @@ module.exports = {
                 selfDeaf: false,
             });
             this.connections[guildId].subscribe(this.players[guildId]);
-        } else {
-            this.connections[guildId].subscribe(this.players[guildId]);
         }
 
-        const videoFinder = async (query) => {
-            const videoResults = await yTsearch(query);
-            return videoResults.videos.length > 1
-                ? videoResults.videos[0]
-                : null;
-        };
-        const video = await videoFinder(args);
-
+        const video = await this.videoFinder(args);
         if (video) {
-            const server = this.servers[guildId]
-            const player = this.players[guildId]
+            const server = this.servers[guildId];
+            const player = this.players[guildId];
             server.queue.push(video);
             if (player.state.status === "idle") {
                 this.playResource(interaction, server.queue[0], "play");
