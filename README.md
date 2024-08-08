@@ -1,3 +1,5 @@
+## My RaspberryPi died and this app is not running any longer 🥲
+
 # JukeBot
 
 Discord music bot
